@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ATS Resume Tool</title>
+</head>
+<body>
+
+    <h1>ATS Resume Analyzer</h1>
+
+    <form id="upload-form">
+        <input type="file" id="resume" accept=".pdf" required>
+        <textarea id="job-description" placeholder="Paste job description here..." required></textarea>
+        <button type="submit" id="analyze-btn">Analyze</button>
+    </form>
+
+    <p id="loading" style="display:none">⏳ Analyzing your resume, please wait...</p>
+
+    <div id="results" style="display:none">
+        <h2>ATS Score: <span id="score"></span>/100</h2>
+
+        <h3>Matched Keywords</h3>
+        <ul id="matched-keywords"></ul>
+
+        <h3>Missing Keywords</h3>
+        <ul id="missing-keywords"></ul>
+
+        <h3>Strengths</h3>
+        <ul id="strengths"></ul>
+
+        <h3>Suggestions</h3>
+        <ul id="suggestions"></ul>
+    </div>
+
+<script>
+    document.getElementById('upload-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        const resume = document.getElementById('resume').files[0];
+        const jobDescription = document.getElementById('job-description').value;
+
+        document.getElementById('loading').style.display = 'block';
+        document.getElementById('results').style.display = 'none';
+        document.getElementById('analyze-btn').disabled = true;
+
+        const formData = new FormData();
+        formData.append('resume', resume);
+        formData.append('job_description', jobDescription);
+
+        const response = await fetch('/upload-resume', {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await response.json();
+
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('analyze-btn').disabled = false;
+
+        document.getElementById('score').textContent = data.ats_score;
+        document.getElementById('results').style.display = 'block';
+
+        function fillList(id, items) {
+            const ul = document.getElementById(id);
+            ul.innerHTML = '';
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                ul.appendChild(li);
+            });
+        }
+
+        fillList('matched-keywords', data.matched_keywords);
+        fillList('missing-keywords', data.missing_keywords);
+        fillList('strengths', data.strengths);
+        fillList('suggestions', data.suggestions);
+    });
+</script>
+
+</body>
+</html>

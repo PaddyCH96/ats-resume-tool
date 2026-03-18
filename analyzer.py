@@ -10,6 +10,8 @@ def analyze(resume_text: str, job_description: str) -> dict:
 
 Analyze the resume against the job description and respond ONLY with a JSON object, no explanation, no markdown, no backticks.
 
+Keep each string in the arrays short - maximum 10 words each.
+
 The JSON must have exactly these fields:
 {{
   "ats_score": <integer 0-100>,
@@ -30,9 +32,9 @@ JOB DESCRIPTION:
         "prompt": prompt,
         "stream": False,
         "options": {
-            "num_predict": 2000
+            "num_predict": 4000
         }
-    })
+    }, timeout=180)
 
     raw = response.json()["response"].strip()
 
@@ -48,4 +50,3 @@ JOB DESCRIPTION:
         if match:
             return json.loads(match.group())
         raise ValueError(f"Could not parse JSON from model: {raw[:300]}")
-    
