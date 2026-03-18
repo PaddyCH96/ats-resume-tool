@@ -14,4 +14,4 @@ async def upload_resume(resume: UploadFile = File(...),job_description: str = Fo
     contents = await resume.read()
     resume_text = extract_text(contents)
     result = analyze(resume_text, job_description)
-    return {"analysis": result}
+    return result
