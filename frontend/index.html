@@ -195,6 +195,14 @@
             border-top: 1px solid #e8e8e4;
             margin: 20px 0;
         }
+
+        #tailored-text {
+            white-space: pre-wrap;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -248,7 +256,19 @@
                 <ul id="suggestions"></ul>
             </div>
 
+            <div class="card">
+                <button id="generate-btn" onclick="generateResume()">Generate Tailored Resume</button>
+            </div>
+
         </div>
+
+        <div id="tailored-result" style="display:none">
+            <div class="card">
+                <div class="section-title">Tailored Resume</div>
+                <pre id="tailored-text"></pre>
+            </div>
+        </div>
+
     </div>
 
 <script>
@@ -260,6 +280,7 @@
 
         document.getElementById('loading').style.display = 'block';
         document.getElementById('results').style.display = 'none';
+        document.getElementById('tailored-result').style.display = 'none';
         document.getElementById('analyze-btn').disabled = true;
 
         const formData = new FormData();
@@ -276,7 +297,6 @@
         document.getElementById('loading').style.display = 'none';
         document.getElementById('analyze-btn').disabled = false;
 
-        // Score with color
         const scoreEl = document.getElementById('score');
         scoreEl.textContent = data.ats_score;
         scoreEl.className = 'score-number';
@@ -286,7 +306,6 @@
 
         document.getElementById('results').style.display = 'block';
 
-        // Keywords as tags
         function fillTags(id, items, tagClass) {
             const container = document.getElementById(id);
             container.innerHTML = '';
@@ -298,7 +317,6 @@
             });
         }
 
-        // Lists
         function fillList(id, items) {
             const ul = document.getElementById(id);
             ul.innerHTML = '';
@@ -314,6 +332,22 @@
         fillList('strengths', data.strengths);
         fillList('suggestions', data.suggestions);
     });
+
+    async function generateResume() {
+        document.getElementById('generate-btn').disabled = true;
+        document.getElementById('generate-btn').textContent = '⏳ Generating...';
+
+        const response = await fetch('/generate-resume', {
+            method: 'POST'
+        });
+
+        const data = await response.json();
+
+        document.getElementById('generate-btn').textContent = 'Generate Tailored Resume';
+        document.getElementById('generate-btn').disabled = false;
+        document.getElementById('tailored-text').textContent = data.tailored_resume;
+        document.getElementById('tailored-result').style.display = 'block';
+    }
 </script>
 
 </body>
