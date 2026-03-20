@@ -6,11 +6,7 @@
     <title>ATS Resume Tool</title>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'DM Sans', sans-serif;
@@ -20,25 +16,167 @@
             padding: 48px 24px;
         }
 
-        .container {
-            max-width: 720px;
-            margin: 0 auto;
-        }
+        .container { max-width: 720px; margin: 0 auto; }
 
         header {
             margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
         }
 
-        header h1 {
-            font-size: 28px;
+        header h1 { font-size: 28px; font-weight: 600; letter-spacing: -0.5px; }
+        header p { margin-top: 6px; color: #666; font-size: 15px; }
+
+        .settings-btn {
+            background: none;
+            border: 1px solid #e8e8e4;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 0;
+            width: auto;
+            color: #444;
+            transition: background 0.2s;
+        }
+
+        .settings-btn:hover { background: #f0f0ee; }
+
+        .settings-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .settings-overlay.open { display: flex; }
+
+        .settings-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+        }
+
+        .settings-panel h2 { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+
+        .settings-panel .tagline {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 24px;
+        }
+
+        .settings-panel .tagline strong { color: #c67c00; }
+
+        .settings-divider { border: none; border-top: 1px solid #e8e8e4; margin: 20px 0; }
+
+        .input-group { margin-bottom: 16px; }
+
+        .input-group label {
+            font-size: 12px;
             font-weight: 600;
-            letter-spacing: -0.5px;
+            color: #444;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
         }
 
-        header p {
-            margin-top: 6px;
-            color: #666;
-            font-size: 15px;
+        .input-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'DM Mono', monospace;
+            font-size: 13px;
+            background: #fafafa;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-group input:focus { border-color: #1a1a1a; background: #fff; }
+        .input-group .hint { font-size: 12px; color: #999; margin-top: 4px; }
+
+        .pro-badge {
+            display: inline-block;
+            background: #1a1a1a;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 999px;
+            letter-spacing: 0.5px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        .free-badge {
+            display: inline-block;
+            background: #eaf5ee;
+            color: #2d7a4f;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 999px;
+            letter-spacing: 0.5px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+
+        .settings-actions { display: flex; gap: 10px; margin-top: 20px; }
+
+        .btn-save {
+            flex: 1;
+            padding: 12px;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 0;
+            width: auto;
+            transition: background 0.2s;
+        }
+
+        .btn-save:hover { background: #333; }
+
+        .btn-cancel {
+            padding: 12px 20px;
+            background: white;
+            color: #444;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            margin-top: 0;
+            width: auto;
+            transition: background 0.2s;
+        }
+
+        .btn-cancel:hover { background: #f5f5f5; }
+
+        .api-status {
+            font-size: 12px;
+            margin-top: 8px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            display: none;
+        }
+
+        .api-status.active {
+            display: block;
+            background: #eaf5ee;
+            color: #2d7a4f;
         }
 
         .card {
@@ -86,10 +224,24 @@
             transition: border-color 0.2s;
         }
 
-        textarea:focus {
-            border-color: #1a1a1a;
-            background: #fff;
+        textarea:focus { border-color: #1a1a1a; background: #fff; }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            background: #fafafa;
+            color: #1a1a1a;
+            outline: none;
+            margin-bottom: 4px;
+            cursor: pointer;
         }
+
+        select:focus { border-color: #1a1a1a; }
+        .model-hint { font-size: 12px; color: #999; margin-bottom: 20px; }
 
         button {
             margin-top: 16px;
@@ -106,26 +258,12 @@
             transition: background 0.2s;
         }
 
-        button:hover {
-            background: #333;
-        }
+        button:hover { background: #333; }
+        button:disabled { background: #999; cursor: not-allowed; }
 
-        button:disabled {
-            background: #999;
-            cursor: not-allowed;
-        }
+        #loading { text-align: center; padding: 24px; color: #666; font-size: 15px; }
 
-        #loading {
-            text-align: center;
-            padding: 24px;
-            color: #666;
-            font-size: 15px;
-        }
-
-        .score-display {
-            text-align: center;
-            padding: 24px 0;
-        }
+        .score-display { text-align: center; padding: 24px 0; }
 
         .score-number {
             font-size: 72px;
@@ -155,64 +293,140 @@
             margin-bottom: 12px;
         }
 
-        .tags {
+        .tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+
+        .tag { padding: 4px 12px; border-radius: 999px; font-size: 13px; font-weight: 500; }
+        .tag-green { background: #eaf5ee; color: #2d7a4f; }
+        .tag-red { background: #fdecea; color: #c0392b; }
+
+        ul { padding-left: 18px; }
+        ul li { font-size: 14px; color: #333; margin-bottom: 6px; line-height: 1.5; }
+
+        .divider { border: none; border-top: 1px solid #e8e8e4; margin: 20px 0; }
+
+        .generate-hint {
+            font-size: 12px;
+            color: #888;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .generate-hint.pro { color: #2d7a4f; }
+
+        .tone-row {
             display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: 10px;
+            margin-bottom: 12px;
+            align-items: center;
         }
 
-        .tag {
-            padding: 4px 12px;
-            border-radius: 999px;
-            font-size: 13px;
-            font-weight: 500;
+        .tone-row select {
+            flex: 1;
+            margin-bottom: 0;
         }
 
-        .tag-green {
-            background: #eaf5ee;
-            color: #2d7a4f;
-        }
-
-        .tag-red {
-            background: #fdecea;
-            color: #c0392b;
-        }
-
-        ul {
-            padding-left: 18px;
-        }
-
-        ul li {
+        .tone-row button {
+            margin-top: 0;
+            width: auto;
+            padding: 12px 20px;
             font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .cover-letter-output {
+            margin-top: 16px;
+            display: none;
+        }
+
+        .cover-letter-text {
+            font-size: 14px;
+            line-height: 1.7;
             color: #333;
-            margin-bottom: 6px;
-            line-height: 1.5;
-        }
-
-        .divider {
-            border: none;
-            border-top: 1px solid #e8e8e4;
-            margin: 20px 0;
-        }
-
-        #tailored-text {
+            padding: 16px;
+            background: #fafafa;
+            border-radius: 8px;
+            border: 1px solid #e8e8e4;
+            outline: none;
             white-space: pre-wrap;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 14px;
-            line-height: 1.6;
-            color: #333;
+            min-height: 200px;
         }
+
+        .cover-letter-text:focus {
+            border-color: #1a1a1a;
+            background: #fff;
+        }
+
+        .copy-btn {
+            margin-top: 10px;
+            background: #f5f5f3;
+            color: #1a1a1a;
+            border: 1px solid #e8e8e4;
+            font-size: 13px;
+            padding: 10px;
+        }
+
+        .copy-btn:hover { background: #ebebeb; }
     </style>
 </head>
 <body>
     <div class="container">
 
         <header>
-            <h1>ATS Resume Analyzer</h1>
-            <p>Upload your resume and paste a job description to get your ATS score.</p>
+            <div>
+                <h1>ATS Resume Analyzer</h1>
+                <p>Upload your resume and paste a job description to get your ATS score.</p>
+            </div>
+            <div style="display:flex; gap:8px; align-items:center;">
+                <a href="/static/tracker.html" style="text-decoration:none;">
+                    <button class="settings-btn">📋 Tracker</button>
+                </a>
+                <button class="settings-btn" onclick="openSettings()">⚙️</button>
+        </div>
+
+
         </header>
 
+        <!-- Settings Overlay -->
+        <div class="settings-overlay" id="settings-overlay">
+            <div class="settings-panel">
+                <h2>API Settings <span class="pro-badge">PRO</span></h2>
+                <p class="tagline">Add your API key to unlock full resume generation. <strong>We suggest Claude — it's pretty good 😉</strong></p>
+
+                <div class="input-group">
+                    <label>API Provider / Base URL</label>
+                    <input type="text" id="api-base" placeholder="https://api.anthropic.com or leave blank for OpenAI">
+                    <p class="hint">Leave blank for OpenAI. For Claude use: https://api.anthropic.com</p>
+                </div>
+
+                <div class="input-group">
+                    <label>Model Name</label>
+                    <input type="text" id="pro-model" placeholder="e.g. claude-sonnet-4-6, gpt-4o, gemini-pro">
+                    <p class="hint">Any model from your provider. Claude is 🔥 for resumes.</p>
+                </div>
+
+                <div class="input-group">
+                    <label>API Key</label>
+                    <input type="password" id="api-key" placeholder="sk-... or your provider's key">
+                    <p class="hint">Stored in your browser only — never sent to our servers except when generating.</p>
+                </div>
+
+                <hr class="settings-divider">
+
+                <div class="input-group">
+                    <label>Free Tier <span class="free-badge">OLLAMA</span></label>
+                    <p class="hint" style="margin-top:0">ATS scoring, keyword analysis, and strengths/suggestions use your Ollama models — always free.</p>
+                </div>
+
+                <div id="api-status" class="api-status"></div>
+
+                <div class="settings-actions">
+                    <button class="btn-save" onclick="saveSettings()">Save Settings</button>
+                    <button class="btn-cancel" onclick="closeSettings()">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Form -->
         <div class="card">
             <form id="upload-form">
                 <label for="resume">Resume (PDF)</label>
@@ -221,12 +435,19 @@
                 <label for="job-description">Job Description</label>
                 <textarea id="job-description" placeholder="Paste the job description here..." required></textarea>
 
+                <label for="model-select">Analysis Model</label>
+                <select id="model-select">
+                    <option value="">Loading models...</option>
+                </select>
+                <p class="model-hint">☁️ Models ending in -cloud run on Ollama's servers. Others run locally.</p>
+
                 <button type="submit" id="analyze-btn">Analyze Resume</button>
             </form>
         </div>
 
         <p id="loading" style="display:none">⏳ Analyzing your resume, please wait...</p>
 
+        <!-- Results -->
         <div id="results" style="display:none">
 
             <div class="card">
@@ -239,9 +460,7 @@
             <div class="card">
                 <div class="section-title">Matched Keywords</div>
                 <div class="tags" id="matched-keywords"></div>
-
                 <hr class="divider">
-
                 <div class="section-title">Missing Keywords</div>
                 <div class="tags" id="missing-keywords"></div>
             </div>
@@ -249,104 +468,265 @@
             <div class="card">
                 <div class="section-title">Strengths</div>
                 <ul id="strengths"></ul>
-
                 <hr class="divider">
-
                 <div class="section-title">Suggestions</div>
                 <ul id="suggestions"></ul>
             </div>
 
+            <!-- Generate Resume -->
             <div class="card">
                 <button id="generate-btn" onclick="generateResume()">Generate Tailored Resume</button>
+                <p class="generate-hint" id="generate-hint">Using Ollama — add an API key in ⚙️ settings for better results</p>
             </div>
 
-        </div>
-
-        <div id="tailored-result" style="display:none">
+            <!-- Cover Letter -->
             <div class="card">
-                <div class="section-title">Tailored Resume</div>
-                <pre id="tailored-text"></pre>
+                <div class="section-title">Cover Letter</div>
+                <div class="tone-row">
+                    <select id="tone-select">
+                        <option value="formal">Formal & Professional</option>
+                        <option value="friendly">Friendly & Conversational</option>
+                        <option value="concise">Concise — 3 paragraphs</option>
+                    </select>
+                    <button id="cover-letter-btn" onclick="generateCoverLetter()">Generate</button>
+                </div>
+                <div id="cover-letter-loading" style="display:none; font-size:13px; color:#666; padding: 8px 0;">⏳ Writing your cover letter...</div>
+                <div class="cover-letter-output" id="cover-letter-output">
+                    <div id="cover-letter-text" class="cover-letter-text" contenteditable="true"></div>
+                    <button class="copy-btn" onclick="copyCoverLetter()">📋 Copy to Clipboard</button>
+                </div>
             </div>
+
         </div>
 
     </div>
 
 <script>
+    // Settings
+    function openSettings() {
+        document.getElementById('settings-overlay').classList.add('open');
+        document.getElementById('api-key').value = localStorage.getItem('api_key') || '';
+        document.getElementById('pro-model').value = localStorage.getItem('pro_model') || '';
+        document.getElementById('api-base').value = localStorage.getItem('api_base') || '';
+        updateApiStatus();
+    }
+
+    function closeSettings() {
+        document.getElementById('settings-overlay').classList.remove('open');
+    }
+
+    function saveSettings() {
+        const apiKey = document.getElementById('api-key').value.trim();
+        const proModel = document.getElementById('pro-model').value.trim();
+        const apiBase = document.getElementById('api-base').value.trim();
+
+        localStorage.setItem('api_key', apiKey);
+        localStorage.setItem('pro_model', proModel);
+        localStorage.setItem('api_base', apiBase);
+
+        updateApiStatus();
+        updateGenerateHint();
+        closeSettings();
+    }
+
+    function updateApiStatus() {
+        const apiKey = localStorage.getItem('api_key');
+        const proModel = localStorage.getItem('pro_model');
+        const status = document.getElementById('api-status');
+        if (apiKey && proModel) {
+            status.textContent = `✅ Pro mode active — using ${proModel}`;
+            status.className = 'api-status active';
+        } else {
+            status.className = 'api-status';
+        }
+    }
+
+    function updateGenerateHint() {
+        const apiKey = localStorage.getItem('api_key');
+        const proModel = localStorage.getItem('pro_model');
+        const hint = document.getElementById('generate-hint');
+        if (apiKey && proModel) {
+            hint.textContent = `✅ Pro mode — using ${proModel}`;
+            hint.className = 'generate-hint pro';
+        } else {
+            hint.textContent = 'Using Ollama — add an API key in ⚙️ settings for better results';
+            hint.className = 'generate-hint';
+        }
+    }
+
+    document.getElementById('settings-overlay').addEventListener('click', function(e) {
+        if (e.target === this) closeSettings();
+    });
+
+    // Load models
+    async function loadModels() {
+        try {
+            const response = await fetch('/models');
+            const data = await response.json();
+            const select = document.getElementById('model-select');
+            select.innerHTML = '';
+            data.models.forEach(model => {
+                const option = document.createElement('option');
+                option.value = model;
+                option.textContent = model;
+                if (model === 'gpt-oss:20b-cloud') option.selected = true;
+                select.appendChild(option);
+            });
+        } catch (err) {
+            console.error('Could not load models:', err);
+        }
+    }
+
+    loadModels();
+    updateGenerateHint();
+
+    // Analyze
     document.getElementById('upload-form').addEventListener('submit', async function(e) {
         e.preventDefault();
 
         const resume = document.getElementById('resume').files[0];
         const jobDescription = document.getElementById('job-description').value;
+        const model = document.getElementById('model-select').value;
 
         document.getElementById('loading').style.display = 'block';
         document.getElementById('results').style.display = 'none';
-        document.getElementById('tailored-result').style.display = 'none';
         document.getElementById('analyze-btn').disabled = true;
 
         const formData = new FormData();
         formData.append('resume', resume);
         formData.append('job_description', jobDescription);
+        formData.append('model', model);
 
-        const response = await fetch('/upload-resume', {
-            method: 'POST',
-            body: formData
-        });
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 180000);
 
-        const data = await response.json();
-
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('analyze-btn').disabled = false;
-
-        const scoreEl = document.getElementById('score');
-        scoreEl.textContent = data.ats_score;
-        scoreEl.className = 'score-number';
-        if (data.ats_score >= 75) scoreEl.classList.add('score-high');
-        else if (data.ats_score >= 50) scoreEl.classList.add('score-mid');
-        else scoreEl.classList.add('score-low');
-
-        document.getElementById('results').style.display = 'block';
-
-        function fillTags(id, items, tagClass) {
-            const container = document.getElementById(id);
-            container.innerHTML = '';
-            items.forEach(item => {
-                const span = document.createElement('span');
-                span.className = `tag ${tagClass}`;
-                span.textContent = item;
-                container.appendChild(span);
+            const response = await fetch('/upload-resume', {
+                method: 'POST',
+                body: formData,
+                signal: controller.signal
             });
-        }
 
-        function fillList(id, items) {
-            const ul = document.getElementById(id);
-            ul.innerHTML = '';
-            items.forEach(item => {
-                const li = document.createElement('li');
-                li.textContent = item;
-                ul.appendChild(li);
-            });
-        }
+            clearTimeout(timeoutId);
 
-        fillTags('matched-keywords', data.matched_keywords, 'tag-green');
-        fillTags('missing-keywords', data.missing_keywords, 'tag-red');
-        fillList('strengths', data.strengths);
-        fillList('suggestions', data.suggestions);
+            if (!response.ok) throw new Error("Failed to analyze resume.");
+            const data = await response.json();
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('analyze-btn').disabled = false;
+
+            const scoreEl = document.getElementById('score');
+            scoreEl.textContent = data.ats_score || 0;
+            scoreEl.className = 'score-number';
+            if (data.ats_score >= 75) scoreEl.classList.add('score-high');
+            else if (data.ats_score >= 50) scoreEl.classList.add('score-mid');
+            else scoreEl.classList.add('score-low');
+
+            document.getElementById('results').style.display = 'block';
+
+            // Reset cover letter
+            document.getElementById('cover-letter-output').style.display = 'none';
+            document.getElementById('cover-letter-text').textContent = '';
+
+            function fillTags(id, items, tagClass) {
+                const container = document.getElementById(id);
+                container.innerHTML = '';
+                (items || []).forEach(item => {
+                    const span = document.createElement('span');
+                    span.className = `tag ${tagClass}`;
+                    span.textContent = item;
+                    container.appendChild(span);
+                });
+            }
+
+            function fillList(id, items) {
+                const ul = document.getElementById(id);
+                ul.innerHTML = '';
+                (items || []).forEach(item => {
+                    const li = document.createElement('li');
+                    li.textContent = item;
+                    ul.appendChild(li);
+                });
+            }
+
+            fillTags('matched-keywords', data.matched_keywords, 'tag-green');
+            fillTags('missing-keywords', data.missing_keywords, 'tag-red');
+            fillList('strengths', data.strengths);
+            fillList('suggestions', data.suggestions);
+
+        } catch (error) {
+            console.error(error);
+            alert("An error occurred. Please check if Ollama is running and try again.");
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('analyze-btn').disabled = false;
+        }
     });
 
+    // Generate Resume
     async function generateResume() {
         document.getElementById('generate-btn').disabled = true;
         document.getElementById('generate-btn').textContent = '⏳ Generating...';
 
-        const response = await fetch('/generate-resume', {
-            method: 'POST'
+        const apiKey = localStorage.getItem('api_key');
+        const proModel = localStorage.getItem('pro_model');
+        const apiBase = localStorage.getItem('api_base') || '';
+
+        if (apiKey && proModel) {
+            sessionStorage.setItem('use_pro', 'true');
+            sessionStorage.setItem('api_key', apiKey);
+            sessionStorage.setItem('pro_model', proModel);
+            sessionStorage.setItem('api_base', apiBase);
+        } else {
+            sessionStorage.setItem('use_pro', 'false');
+        }
+
+        window.location.href = '/static/resume.html';
+    }
+
+    // Cover Letter
+    async function generateCoverLetter() {
+        const btn = document.getElementById('cover-letter-btn');
+        const tone = document.getElementById('tone-select').value;
+
+        btn.disabled = true;
+        btn.textContent = '⏳ Writing...';
+        document.getElementById('cover-letter-loading').style.display = 'block';
+        document.getElementById('cover-letter-output').style.display = 'none';
+
+        try {
+            const formData = new FormData();
+            formData.append('tone', tone);
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 180000);
+
+            const response = await fetch('/generate-cover-letter', {
+                method: 'POST',
+                body: formData,
+                signal: controller.signal
+            });
+
+            clearTimeout(timeoutId);
+            const data = await response.json();
+
+            document.getElementById('cover-letter-loading').style.display = 'none';
+            document.getElementById('cover-letter-text').textContent = data.cover_letter || 'Could not generate cover letter.';
+            document.getElementById('cover-letter-output').style.display = 'block';
+
+        } catch (err) {
+            document.getElementById('cover-letter-loading').style.display = 'none';
+            alert('Cover letter generation failed. Please try again.');
+        }
+
+        btn.disabled = false;
+        btn.textContent = 'Generate';
+    }
+
+    function copyCoverLetter() {
+        const text = document.getElementById('cover-letter-text').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            alert('✅ Copied to clipboard!');
         });
-
-        const data = await response.json();
-
-        document.getElementById('generate-btn').textContent = 'Generate Tailored Resume';
-        document.getElementById('generate-btn').disabled = false;
-        document.getElementById('tailored-text').textContent = data.tailored_resume;
-        document.getElementById('tailored-result').style.display = 'block';
     }
 </script>
 

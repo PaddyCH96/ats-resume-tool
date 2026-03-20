@@ -1,0 +1,13 @@
+{
+    "cSpell.words": [
+        "anyio",
+        "certifi",
+        "fastapi",
+        "pydantic",
+        "pymupdf",
+        "reportlab",
+        "starlette",
+        "urllib",
+        "uvicorn"
+    ]
+}

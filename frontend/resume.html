@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailored Resume</title>
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Source Sans 3', sans-serif;
+            background: #f0f0f0;
+            padding: 40px 24px;
+        }
+
+        .toolbar {
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            gap: 12px;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .toolbar-right { display: flex; gap: 12px; }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-family: 'Source Sans 3', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-primary { background: #1a1a1a; color: white; }
+        .btn-primary:hover { background: #333; }
+        .btn-secondary { background: #fff; color: #1a1a1a; border: 1px solid #ccc; }
+        .btn-secondary:hover { background: #f5f5f5; }
+
+        .pro-banner {
+            max-width: 800px;
+            margin: 0 auto 16px auto;
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            border-radius: 10px;
+            padding: 14px 20px;
+            font-size: 13px;
+            color: #92400e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .pro-banner.hidden { display: none; }
+
+        .pro-banner strong { font-weight: 600; }
+
+        .pro-banner-active {
+            background: #eaf5ee;
+            border-color: #a7f3d0;
+            color: #065f46;
+        }
+
+        .btn-upgrade {
+            padding: 6px 14px;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            font-family: 'Source Sans 3', sans-serif;
+        }
+
+        /* Settings Modal */
+        .settings-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .settings-overlay.open { display: flex; }
+
+        .settings-panel {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+        }
+
+        .settings-panel h2 { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+
+        .settings-panel .tagline {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .settings-panel .tagline strong { color: #c67c00; }
+
+        .input-group { margin-bottom: 16px; }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #444;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Source Sans 3', monospace;
+            font-size: 13px;
+            background: #fafafa;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .input-group input:focus { border-color: #1a1a1a; background: #fff; }
+        .input-group .hint { font-size: 12px; color: #999; margin-top: 4px; }
+
+        .storage-note {
+            background: #f9f9f7;
+            border: 1px solid #e8e8e4;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .storage-note strong { color: #1a1a1a; }
+
+        .settings-actions { display: flex; gap: 10px; margin-top: 20px; }
+
+        .btn-save {
+            flex: 1;
+            padding: 12px;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Source Sans 3', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-save:hover { background: #333; }
+
+        .btn-cancel {
+            padding: 12px 20px;
+            background: white;
+            color: #444;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Source Sans 3', sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-cancel:hover { background: #f5f5f5; }
+
+        /* Resume */
+        .resume {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 48px 56px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+
+        .resume-header { text-align: center; margin-bottom: 20px; }
+
+        .resume-name {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .resume-contact { font-size: 13px; color: #333; margin-top: 6px; }
+        .resume-contact span { margin: 0 4px; }
+
+        .resume-section { margin-top: 18px; }
+
+        .section-header {
+            font-family: 'Libre Baskerville', serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1.5px solid #1a1a1a;
+            padding-bottom: 3px;
+            margin-bottom: 10px;
+        }
+
+        .entry { margin-bottom: 12px; }
+
+        .entry-top { display: flex; justify-content: space-between; align-items: baseline; }
+        .entry-company { font-weight: 600; font-size: 14px; }
+        .entry-location { font-size: 13px; color: #444; }
+
+        .entry-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-top: 1px;
+        }
+
+        .entry-position { font-style: italic; font-size: 13px; }
+        .entry-dates { font-size: 13px; color: #444; }
+
+        .entry-bullets { margin-top: 4px; padding-left: 18px; }
+        .entry-bullets li { font-size: 13px; line-height: 1.5; margin-bottom: 3px; }
+
+        .summary-text { font-size: 13px; line-height: 1.6; color: #333; }
+        .skills-block { font-size: 13px; line-height: 1.8; }
+        .skills-block strong { font-weight: 600; }
+        .edu-details { font-size: 13px; color: #333; margin-top: 2px; }
+
+        [contenteditable="true"] {
+            outline: none;
+            border-radius: 3px;
+            transition: background 0.15s;
+        }
+
+        [contenteditable="true"]:hover { background: #f5f9ff; }
+        [contenteditable="true"]:focus {
+            background: #eef4ff;
+            box-shadow: 0 0 0 2px #b3d1ff;
+        }
+
+        .edit-hint { text-align: center; font-size: 12px; color: #888; margin-bottom: 12px; }
+
+        .loading-msg { text-align: center; padding: 60px; color: #666; font-size: 15px; }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .toolbar, .edit-hint, .pro-banner, .settings-overlay { display: none !important; }
+            .resume { box-shadow: none; padding: 24px 32px; max-width: 100%; }
+            [contenteditable="true"]:hover,
+            [contenteditable="true"]:focus { background: transparent; box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Settings Modal -->
+<div class="settings-overlay" id="settings-overlay">
+    <div class="settings-panel">
+        <h2>Unlock Pro Resume Generation</h2>
+        <p class="tagline">Add your API key to get a perfectly tailored, ready-to-download resume. <strong>We suggest Claude — it's pretty good 😉</strong></p>
+
+        <div class="storage-note">
+            🔒 <strong>Your API key is stored only in your browser (localStorage).</strong> It is never sent to our servers except when making a generation request directly to your chosen API provider.
+        </div>
+
+        <div class="input-group">
+            <label>API Base URL</label>
+            <input type="text" id="api-base" placeholder="https://api.anthropic.com (or leave blank for OpenAI)">
+            <p class="hint">For Claude: https://api.anthropic.com — For OpenAI: leave blank</p>
+        </div>
+
+        <div class="input-group">
+            <label>Model Name</label>
+            <input type="text" id="pro-model" placeholder="e.g. claude-sonnet-4-6, gpt-4o">
+            <p class="hint">Any model from your provider. Claude is 🔥 for resumes.</p>
+        </div>
+
+        <div class="input-group">
+            <label>API Key</label>
+            <input type="password" id="api-key" placeholder="sk-... or your provider's key">
+        </div>
+
+        <div class="settings-actions">
+            <button class="btn-save" onclick="saveAndGenerate()">Save & Generate Resume</button>
+            <button class="btn-cancel" onclick="closeSettings()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div class="toolbar">
+    <button class="btn btn-secondary" onclick="window.location.href='index.html'">← Back</button>
+    <div class="toolbar-right">
+        <button class="btn btn-secondary" onclick="openSettings()">⚙️ Pro Settings</button>
+        <button class="btn btn-primary" onclick="window.print()">Download as PDF</button>
+    </div>
+</div>
+
+<div id="pro-banner" class="pro-banner hidden"></div>
+
+<p class="edit-hint">✏️ Click any text to edit before downloading</p>
+
+<div class="resume" id="resume">
+    <div class="loading-msg">⏳ Generating your tailored resume, please wait...</div>
+</div>
+
+<script>
+    const HEADER_KEYS = ['name', 'email', 'phone', 'linkedin', 'github', 'location', 'website'];
+    const ENTRY_KEYS = ['work_experience', 'experience', 'projects', 'leadership', 'leadership_experience', 'certifications'];
+    const EDU_KEYS = ['education'];
+    const TEXT_KEYS = ['summary', 'objective', 'interests', 'about', 'professional_summary'];
+    const SKILLS_KEYS = ['skills', 'key_skills', 'technical_skills', 'core_skills'];
+
+    function formatSectionTitle(key) {
+        return key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+    }
+
+    function buildHeader(data) {
+        const name = data.name || data.full_name || '';
+        const location = data.location || '';
+        const linkedin = data.linkedin || '';
+        const github = data.github || '';
+        const phone = data.phone || '';
+        const email = data.email || '';
+
+        const contactParts = [location, linkedin, github, phone, email].filter(Boolean);
+        const contactHTML = contactParts.map(p =>
+            `<span contenteditable="true">${p}</span>`
+        ).join(' | ');
+
+        return `
+        <div class="resume-header">
+            <div class="resume-name" contenteditable="true">${name}</div>
+            <div class="resume-contact">${contactHTML}</div>
+        </div>`;
+    }
+
+    function buildEntrySection(title, entries) {
+        if (!entries || !entries.length) return '';
+
+        const entriesHTML = entries.map(entry => {
+            const company = entry.company || entry.organisation || entry.organization || entry.name || '';
+            const location = entry.location || '';
+            const position = entry.position || entry.role || entry.title || '';
+            const dates = entry.dates || entry.date || entry.duration || '';
+            const bullets = entry.bullets || entry.responsibilities || entry.achievements || [];
+            const details = entry.details || entry.description || '';
+
+            const bulletsHTML = Array.isArray(bullets)
+                ? bullets.map(b => `<li contenteditable="true">${b}</li>`).join('')
+                : '';
+
+            return `
+            <div class="entry">
+                <div class="entry-top">
+                    <span class="entry-company" contenteditable="true">${company}</span>
+                    <span class="entry-location" contenteditable="true">${location}</span>
+                </div>
+                <div class="entry-bottom">
+                    <span class="entry-position" contenteditable="true">${position}</span>
+                    <span class="entry-dates" contenteditable="true">${dates}</span>
+                </div>
+                ${bulletsHTML ? `<ul class="entry-bullets">${bulletsHTML}</ul>` : ''}
+                ${details ? `<p class="edu-details" contenteditable="true">${details}</p>` : ''}
+            </div>`;
+        }).join('');
+
+        return `
+        <div class="resume-section">
+            <div class="section-header">${title}</div>
+            ${entriesHTML}
+        </div>`;
+    }
+
+    function buildSkillsSection(title, skills) {
+        if (!skills) return '';
+        let content = '';
+
+        if (typeof skills === 'string') {
+            content = `<p class="skills-block" contenteditable="true">${skills}</p>`;
+        } else if (Array.isArray(skills)) {
+            content = `<p class="skills-block" contenteditable="true">${skills.join(', ')}</p>`;
+        } else if (typeof skills === 'object') {
+            content = Object.entries(skills).map(([k, v]) =>
+                `<p class="skills-block"><strong>${formatSectionTitle(k)}:</strong> <span contenteditable="true">${Array.isArray(v) ? v.join(', ') : v}</span></p>`
+            ).join('');
+        }
+
+        return `
+        <div class="resume-section">
+            <div class="section-header">${title}</div>
+            ${content}
+        </div>`;
+    }
+
+    function buildTextSection(title, text) {
+        if (!text) return '';
+        return `
+        <div class="resume-section">
+            <div class="section-header">${title}</div>
+            <p class="summary-text" contenteditable="true">${text}</p>
+        </div>`;
+    }
+
+    function renderResume(data) {
+        let html = buildHeader(data);
+        const rendered = new Set(HEADER_KEYS);
+
+        const sectionOrder = [
+            'summary', 'professional_summary', 'objective', 'about',
+            'key_skills', 'skills', 'technical_skills', 'core_skills',
+            'work_experience', 'experience',
+            'projects',
+            'leadership', 'leadership_experience',
+            'education',
+            'certifications',
+            'interests'
+        ];
+
+        sectionOrder.forEach(key => {
+            if (!data[key]) return;
+            rendered.add(key);
+            const title = formatSectionTitle(key);
+
+            if (TEXT_KEYS.includes(key)) {
+                html += buildTextSection(title, data[key]);
+            } else if (SKILLS_KEYS.includes(key)) {
+                html += buildSkillsSection(title, data[key]);
+            } else if (EDU_KEYS.includes(key) || ENTRY_KEYS.includes(key)) {
+                html += buildEntrySection(title, data[key]);
+            }
+        });
+
+        Object.keys(data).forEach(key => {
+            if (rendered.has(key)) return;
+            rendered.add(key);
+            const title = formatSectionTitle(key);
+            const val = data[key];
+
+            if (typeof val === 'string') {
+                html += buildTextSection(title, val);
+            } else if (Array.isArray(val)) {
+                html += buildEntrySection(title, val);
+            } else if (typeof val === 'object') {
+                html += buildSkillsSection(title, val);
+            }
+        });
+
+        document.getElementById('resume').innerHTML = html;
+    }
+
+    // Settings
+    function openSettings() {
+        document.getElementById('api-key').value = localStorage.getItem('api_key') || '';
+        document.getElementById('pro-model').value = localStorage.getItem('pro_model') || '';
+        document.getElementById('api-base').value = localStorage.getItem('api_base') || '';
+        document.getElementById('settings-overlay').classList.add('open');
+    }
+
+    function closeSettings() {
+        document.getElementById('settings-overlay').classList.remove('open');
+    }
+
+    document.getElementById('settings-overlay').addEventListener('click', function(e) {
+        if (e.target === this) closeSettings();
+    });
+
+    function saveAndGenerate() {
+        const apiKey = document.getElementById('api-key').value.trim();
+        const proModel = document.getElementById('pro-model').value.trim();
+        const apiBase = document.getElementById('api-base').value.trim();
+
+        if (!apiKey || !proModel) {
+            alert('Please enter both a model name and API key.');
+            return;
+        }
+
+        localStorage.setItem('api_key', apiKey);
+        localStorage.setItem('pro_model', proModel);
+        localStorage.setItem('api_base', apiBase);
+
+        closeSettings();
+        loadResume(true);
+    }
+
+    function showBanner(isPro, model) {
+        const banner = document.getElementById('pro-banner');
+        banner.classList.remove('hidden');
+        if (isPro) {
+            banner.className = 'pro-banner pro-banner-active';
+            banner.innerHTML = `✅ <strong>Pro mode</strong> — Generated using ${model}. Click any text to edit before downloading.`;
+        } else {
+            banner.className = 'pro-banner';
+            banner.innerHTML = `
+                <span>🆓 <strong>Free tier</strong> — Results may vary with Ollama models. 
+                Add an API key for a polished, ready-to-apply resume.</span>
+                <button class="btn-upgrade" onclick="openSettings()">Unlock Pro ✨</button>`;
+        }
+    }
+
+    async function loadResume(forcePro = false) {
+        document.getElementById('resume').innerHTML =
+            '<div class="loading-msg">⏳ Generating your tailored resume, please wait...</div>';
+
+        const apiKey = localStorage.getItem('api_key');
+        const proModel = localStorage.getItem('pro_model');
+        const apiBase = localStorage.getItem('api_base') || '';
+        const usePro = (forcePro || sessionStorage.getItem('use_pro') === 'true') && apiKey && proModel;
+
+        try {
+            let response;
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 180000);
+
+            if (usePro) {
+                const formData = new FormData();
+                formData.append('api_key', apiKey);
+                formData.append('model', proModel);
+                formData.append('api_base', apiBase);
+
+                response = await fetch('/generate-resume-pro', {
+                    method: 'POST',
+                    body: formData,
+                    signal: controller.signal
+                });
+            } else {
+                response = await fetch('/generate-resume', {
+                    method: 'POST',
+                    signal: controller.signal
+                });
+            }
+
+            clearTimeout(timeoutId);
+            const data = await response.json();
+
+            if (data.error) {
+                document.getElementById('resume').innerHTML =
+                    '<div class="loading-msg">⚠️ Please analyze a resume first before generating.</div>';
+                return;
+            }
+
+            renderResume(data);
+            showBanner(usePro, proModel);
+
+        } catch (err) {
+            document.getElementById('resume').innerHTML =
+                '<div class="loading-msg">⚠️ Generation timed out or failed. Please go back and try again.</div>';
+        }
+    }
+
+    loadResume();
+</script>
+
+</body>
+</html>
